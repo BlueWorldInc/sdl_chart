@@ -1,0 +1,3 @@
+@echo off
+echo Compiling...
+g++ -O0 -L lib -I include .\example.cpp .\graph.cpp -o chart_example -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf && powershell write-host -fore Green Compile success && .\chart_example.exe

@@ -1,0 +1,8 @@
+Known issue:
+    Bug:
+    -a bug where the AI don't play it's move, so the player play twice in a row. Happen kind of rarely (once in 30 move)
+    -a bug where the winner is the wrong person, happend 50% of the time.
+    Other:
+    -the chosen mode don't affect if we play against the ai or not
+    -don't display the number of turn won by each player.
+    
