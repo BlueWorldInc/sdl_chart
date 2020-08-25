@@ -18,337 +18,352 @@
 
 #include "./include/sdl_graph/sdlgraph.h"
 
-
-Uint32 * get_pixel_from_coordinates ( Graph * myGraph, float x, float y )
+Uint32 *get_pixel_from_coordinates(Graph *myGraph, float x, float y)
 {
-  	Uint32 * pixel;
-  	
-	int realWidth = get_width_from_coordinate(myGraph, x); 
-  	
-  	
-	int realHeight = get_height_from_coordinate(myGraph, y);
-  	
-  	
-  	if ( realHeight < 0 || realHeight >= myGraph->height || realWidth < 0 || realWidth >= myGraph->width )
-		return NULL;
-  	else
-  	{
-		pixel = (Uint32*) myGraph->workingSurface->pixels;
-		
-		Uint32 width,height;
-		width = realWidth;
-		height = realHeight * myGraph->width;
-		pixel += width + height;
-		
-		return pixel;
-	}
+	Uint32 *pixel;
 
+	int realWidth = get_width_from_coordinate(myGraph, x);
+
+	int realHeight = get_height_from_coordinate(myGraph, y);
+
+	if (realHeight < 0 || realHeight >= myGraph->height || realWidth < 0 || realWidth >= myGraph->width)
+		return NULL;
+	else
+	{
+		// pixel = (Uint32*) myGraph->workingSurface->pixels;
+
+		// Uint32 width,height;
+		// width = realWidth;
+		// height = realHeight * myGraph->width;
+		// pixel += width + height;
+
+		// return pixel;
+	}
+	return NULL;
 }
 
-Uint32 * get_pixel_from_window ( Graph * myGraph, int x, int y )
+Uint32 *get_pixel_from_window(Graph *myGraph, int x, int y)
 {
-  	Uint32 * pixel;
-  	
-  	if ( y < 0 || y >= myGraph->height || x < 0 || x >= myGraph->width )
+	Uint32 *pixel;
+
+	if (y < 0 || y >= myGraph->height || x < 0 || x >= myGraph->width)
 		return NULL;
-  	else
-  	{
-		Uint32 width,height;
+	else
+	{
+		Uint32 width, height;
 		width = x;
 		height = y * myGraph->width;
-		pixel = (Uint32*)myGraph->workingSurface->pixels + width + height;
+		pixel = (Uint32 *)myGraph->renderer + width + height;
 		return pixel;
 	}
-
+	return NULL;
 }
 
-int get_width_from_coordinate ( Graph * myGraph, float x )
+int get_width_from_coordinate(Graph *myGraph, float x)
 {
-  	int realWidth = (int)((float)myGraph->width * (x - myGraph->xMin) / (myGraph->xMax - myGraph->xMin));
-	
-	return realWidth;	
+	int realWidth = (int)((float)myGraph->width * (x - myGraph->xMin) / (myGraph->xMax - myGraph->xMin));
+
+	return realWidth;
 }
 
-int get_height_from_coordinate ( Graph * myGraph, float y )
+int get_height_from_coordinate(Graph *myGraph, float y)
 {
-  	int realHeight = (int)((float)myGraph->height - (float)myGraph->height * (y - myGraph->yMin) / (myGraph->yMax - myGraph->yMin));
-	
-	return realHeight;	
+	int realHeight = (int)((float)myGraph->height - (float)myGraph->height * (y - myGraph->yMin) / (myGraph->yMax - myGraph->yMin));
+
+	return realHeight;
 }
 
-void init_graph ( Graph * myGraph )
+void init_graph(Graph *myGraph)
 {
-	SDL_Window *window = NULL;
-    window = SDL_CreateWindow("Rain", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, myGraph->width, myGraph->height, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    // SDL_WM_SetCaption("GRAPH OUTPUT", NULL);
-    set_color(myGraph, 0xFF, 0xFF, 0xFF);
-      
+	SDL_Color orange = {255, 127, 40, 255};
+	SDL_Color black = {0, 0, 0, 255};
+	SDL_Color white = {255, 255, 255, 255};
+	myGraph->window = SDL_CreateWindow("Blue World", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, myGraph->width, myGraph->height, SDL_WINDOW_FULLSCREEN_DESKTOP);
+	myGraph->renderer = SDL_CreateRenderer(myGraph->window, -1, SDL_RENDERER_ACCELERATED);
+	SDL_SetRenderDrawColor(myGraph->renderer, black.r, white.g, black.b, black.a);
+	set_color(myGraph, 0xFF, 0xFF, 0xFF);
 }
 
-void draw_grid ( Graph * myGraph, int thickness, int length )
+void draw_grid(Graph *myGraph, int thickness, int length)
 {
-	
-	
+
 	int height, width;
-	
+
 	thickness = abs(thickness);
 	length = abs(length);
-	
-	
+
 	height = get_height_from_coordinate(myGraph, 0.0);
 	width = get_width_from_coordinate(myGraph, 0.0);
-	
-	
+
 	int countX, countY;
-	
+
 	int pitchX, pitchY;
 	pitchX = get_width_from_coordinate(myGraph, myGraph->xScale) - width;
 	pitchY = get_height_from_coordinate(myGraph, myGraph->yScale) - height;
-	
-	
-	for ( countX = 0; countX < myGraph->width; countX++ )
+
+	for (countX = 0; countX < myGraph->width; countX++)
 	{
-		
-		
-		if ( (countX - width) % pitchX == 0 )
+
+		if ((countX - width) % pitchX == 0)
 		{
-			
-			for ( countY = height - length; countY <= height + length; countY++ )
+
+			for (countY = height - length; countY <= height + length; countY++)
 			{
 				print_pixel_by_window(myGraph, countX, countY);
 			}
 		}
-		
+
 		else
 		{
-			for ( countY = height - thickness; countY <= height + thickness; countY++ )
+			for (countY = height - thickness; countY <= height + thickness; countY++)
 			{
-				
-		    
-				print_pixel_by_window ( myGraph, countX, countY );
+
+				print_pixel_by_window(myGraph, countX, countY);
 			}
 		}
 	}
-	
-	for ( countY = 0; countY < myGraph->height; countY++ )
+
+	for (countY = 0; countY < myGraph->height; countY++)
 	{
-		
-		if ( ((countY - height) % pitchY) == 0 )
+
+		if (((countY - height) % pitchY) == 0)
 		{
-			
-			for ( countX = width - length; countX <= width + length; countX++ )
+
+			for (countX = width - length; countX <= width + length; countX++)
 			{
-				
-			   
-				print_pixel_by_window ( myGraph, countX, countY );
+
+				print_pixel_by_window(myGraph, countX, countY);
 			}
 		}
-		
-		
+
 		else
 		{
-			for ( countX = width - thickness; countX <= width + thickness; countX++ )
+			for (countX = width - thickness; countX <= width + thickness; countX++)
 			{
-			   
-				print_pixel_by_window ( myGraph, countX, countY );
+
+				print_pixel_by_window(myGraph, countX, countY);
 			}
 		}
 	}
-	
-	 
 }
 
-void print_pixel_by_window ( Graph * myGraph, int x, int y )
+Pix convert_to_pix(Graph* graph, float x, float y);
+
+void print_pixel_by_window(Graph *myGraph, int x, int y)
 {
-	Uint32 * pixel;
+	Uint32 *pixel;
 	SDL_Event event;
-	if ( SDL_PollEvent ( &event ) )
+	if (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT)
 		{
-				quit();
+			quit();
 		}
 	}
-	
-	
-		pixel = get_pixel_from_window( myGraph, x, y );
-	
-		if( pixel != NULL )
-			*pixel = myGraph->color;
-	
-	
+
+	SDL_RenderDrawPoint(myGraph->renderer, x, y);
+
+	// if( pixel != NULL )
+	// *pixel = myGraph->color;
 }
-	
-void print_pixel ( Graph * myGraph, float x, float y )
+
+void print_pixel(Graph *myGraph, float x, float y)
 {
-	Uint32 * pixel;
+	Uint32 *pixel;
 	SDL_Event event;
-	if ( SDL_PollEvent ( &event ) )
+	if (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT)
 		{
-				quit();
+			quit();
 		}
 	}
-	
-		pixel = get_pixel_from_coordinates( myGraph, x, y );
-	
-		if( pixel != NULL )
-			*pixel = myGraph->color;
-	
+
+	Uint32 width,height;
+		// height = realHeight * myGraph->width;
+
+	width = get_width_from_coordinate(myGraph, x);
+
+	height = get_height_from_coordinate(myGraph, y);
+
+	std::cout << width << " " << height << std::endl;
+
+
+	SDL_RenderDrawPoint(myGraph->renderer, width, height);
+
+	// std::cout << "test: print_pixel is working fine" << std::endl;
+
+	// pixel = get_pixel_from_coordinates(myGraph, x, y);
+
+	// if (pixel != NULL)
+	// 	*pixel = myGraph->color;
 }
-	
-void print_pixel_by_window_color ( Graph * myGraph, int x, int y, Uint32 color )
+
+void print_pixel_by_window_color(Graph *myGraph, int x, int y, Uint32 color)
 {
-	Uint32 * pixel;
+	Uint32 *pixel;
 	SDL_Event event;
-	if ( SDL_PollEvent ( &event ) )
+	if (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT)
 		{
-				quit();
+			quit();
 		}
 	}
-	
-	
-		pixel = get_pixel_from_window( myGraph, x, y );
-	
-		if( pixel != NULL )
-			*pixel = color;	
-	
+
+	pixel = get_pixel_from_window(myGraph, x, y);
+
+	if (pixel != NULL)
+		*pixel = color;
 }
 
-void print_pixel_color ( Graph * myGraph, float x, float y, Uint32 color )
+void print_pixel_color(Graph *myGraph, float x, float y, Uint32 color)
 {
-	Uint32 * pixel;
+	Uint32 *pixel;
 	SDL_Event event;
-	if ( SDL_PollEvent ( &event ) )
+	if (SDL_PollEvent(&event))
 	{
 		if (event.type == SDL_QUIT)
 		{
-				quit();
+			quit();
 		}
 	}
-	
-		pixel = get_pixel_from_coordinates( myGraph, x, y );
-	
-		if( pixel != NULL )
-			*pixel = color;
+
+	pixel = get_pixel_from_coordinates(myGraph, x, y);
+
+	if (pixel != NULL)
+		*pixel = color;
 }
 
-void update_screen(Graph * myGraph)
+void update_screen(Graph *myGraph)
 {
-	if (SDL_RenderPresent(myGraph->workingSurface) != 0) quit();
+	SDL_RenderPresent(myGraph->renderer);
 }
 
-void delay ( int time )
+void delay(int time)
 {
 	int startTime = SDL_GetTicks();
-	
+
 	SDL_Event event;
-	
-	while ( (SDL_GetTicks() - startTime) < time )
+
+	while ((SDL_GetTicks() - startTime) < time)
 	{
-		if ( SDL_PollEvent ( &event ) )
+		if (SDL_PollEvent(&event))
 		{
 			if (event.type == SDL_QUIT)
 			{
 				quit();
 			}
 		}
-		else 
-			SDL_Delay( 1 );
+		else
+			SDL_Delay(1);
 	}
 }
 
-void clear_graph(Graph * myGraph)
+void clear_graph(Graph *myGraph)
 {
-	SDL_FillRect(myGraph->workingSurface, NULL, 0x00000000);
+	SDL_Color orange = {255, 127, 40, 255};
+	SDL_Color black = {0, 0, 0, 255};
+	SDL_Color white = {255, 255, 255, 255};
+	SDL_SetRenderDrawColor(myGraph->renderer, black.r, black.g, black.b, black.a);
+	SDL_RenderClear(myGraph->renderer);
 }
 
 void idle()
 {
 	SDL_Event event;
-	while ( 1 )
+
+	while (1)
 	{
-		if ( SDL_PollEvent ( &event ) )
+		if (SDL_PollEvent(&event))
 		{
-			if (event.type == SDL_QUIT)
+			// if (event.type == SDL_QUIT)
+			// {
+			// 	quit();
+			// }
+
+			switch (event.type)
 			{
-				quit();
+			case SDL_KEYDOWN:
+			std::cout << "test: idle is working fine" << std::endl;
+					quit();
+					break;
+				// }
 			}
 		}
 		else
+		{
 			delay(1);
+		}
 	}
 }
 
-int write_BMP_header(FILE * file, int width, int height )
+int write_BMP_header(FILE *file, int width, int height)
 {
 	int size;
-	if ( width % 4 == 0 )
-		size = 54 + 3*width*height;
+	if (width % 4 == 0)
+		size = 54 + 3 * width * height;
 	else
-		size = 54 + 3*width*height + height*(4 - width%4);
+		size = 54 + 3 * width * height + height * (4 - width % 4);
 
-	int temp[0x36] = { 
-		0x42, 0x4D, // Magic number 
-		size%0x100, size/0x100, size/0x10000, size/0x1000000, // Size of BMP file
-	    0x00, 0x00, // NA
-		0x00, 0x00, // NA
-		0x36, 0x00, 0x00, 0x00, // The offset where the bitmap data can be found 
-		0x28, 0x00, 0x00, 0x00, // The number of bytes in the header (from this point)
-		width%0x100, width/0x100, width/0x10000, width/0x1000000, // Width of bitmap in pixels
-		height%0x100, height/0x100, height/0x10000, height/0x1000000, // The height of the bitmap in pixels
-		0x01, 0x00, // Number color planes being used
-		0x18, 0x00, // Number of bits/pixel
-		0x00, 0x00, 0x00, 0x00, // BI_RGB, No compression
-		0x10, 0x00, 0x00, 0x00, // Size of raw BMP data (after this header) 
-		0x13, 0x0B, 0x00, 0x00, // Horizontal reso (pixels/meter)
-		0x13, 0x0B, 0x00, 0x00, // Vertical reso (pixels/meter)
-		0x00, 0x00, 0x00, 0x00, // Number of colors in the palette
-		0x00, 0x00, 0x00, 0x00 // All colors are important
-		};
+	int temp[0x36] = {
+		0x42, 0x4D,															  // Magic number
+		size % 0x100, size / 0x100, size / 0x10000, size / 0x1000000,		  // Size of BMP file
+		0x00, 0x00,															  // NA
+		0x00, 0x00,															  // NA
+		0x36, 0x00, 0x00, 0x00,												  // The offset where the bitmap data can be found
+		0x28, 0x00, 0x00, 0x00,												  // The number of bytes in the header (from this point)
+		width % 0x100, width / 0x100, width / 0x10000, width / 0x1000000,	  // Width of bitmap in pixels
+		height % 0x100, height / 0x100, height / 0x10000, height / 0x1000000, // The height of the bitmap in pixels
+		0x01, 0x00,															  // Number color planes being used
+		0x18, 0x00,															  // Number of bits/pixel
+		0x00, 0x00, 0x00, 0x00,												  // BI_RGB, No compression
+		0x10, 0x00, 0x00, 0x00,												  // Size of raw BMP data (after this header)
+		0x13, 0x0B, 0x00, 0x00,												  // Horizontal reso (pixels/meter)
+		0x13, 0x0B, 0x00, 0x00,												  // Vertical reso (pixels/meter)
+		0x00, 0x00, 0x00, 0x00,												  // Number of colors in the palette
+		0x00, 0x00, 0x00, 0x00												  // All colors are important
+	};
 
-		int count;
-		for ( count = 0; count < 0x36; count++ )
-		{
-			if (fputc(temp[count], file) == EOF )
-				return 0;
-		}
-		return 1;
+	int count;
+	for (count = 0; count < 0x36; count++)
+	{
+		if (fputc(temp[count], file) == EOF)
+			return 0;
+	}
+	return 1;
 }
 
-int write_BMP_data(FILE * file, Graph * myGraph )
+int write_BMP_data(FILE *file, Graph *myGraph)
 {
 	int count, padding;
-	if ( myGraph->width % 4 == 0 )
+	if (myGraph->width % 4 == 0)
 		padding = 0;
 	else
-		padding = 4 - (3*myGraph->width)%4;
+		padding = 4 - (3 * myGraph->width) % 4;
 
-	Uint32 * pixel;
-	Uint8 * subpixel;
+	Uint32 *pixel;
+	Uint8 *subpixel;
 
 	int widthCount, heightCount;
 
-	for ( heightCount = 0; heightCount < myGraph->height; heightCount++ )
+	for (heightCount = 0; heightCount < myGraph->height; heightCount++)
 	{
-		for ( widthCount = 0; widthCount < myGraph->width; widthCount++ )
+		for (widthCount = 0; widthCount < myGraph->width; widthCount++)
 		{
 			pixel = get_pixel_from_window(myGraph, widthCount, myGraph->height - heightCount - 1);
-			if ( pixel != NULL )
+			if (pixel != NULL)
 			{
-			subpixel = (Uint8*)pixel;
-			if (fputc(subpixel[0], file) == EOF)
-				return 0;
-			if (fputc(subpixel[1], file) == EOF)
-				return 0;
-			if (fputc(subpixel[2], file) == EOF)
-				return 0;
+				subpixel = (Uint8 *)pixel;
+				if (fputc(subpixel[0], file) == EOF)
+					return 0;
+				if (fputc(subpixel[1], file) == EOF)
+					return 0;
+				if (fputc(subpixel[2], file) == EOF)
+					return 0;
 			}
 		}
-        for ( count = 0; count < padding; count++ )
+		for (count = 0; count < padding; count++)
 		{
 			if (fputc(0x00, file) == EOF)
 				return 0;
@@ -357,11 +372,10 @@ int write_BMP_data(FILE * file, Graph * myGraph )
 	return 1;
 }
 
-
-void write_BMP(Graph * myGraph, char * name)
+void write_BMP(Graph *myGraph, char *name)
 {
-	FILE * file = fopen(name, "wb");
-	if ( file == NULL )
+	FILE *file = fopen(name, "wb");
+	if (file == NULL)
 	{
 		fprintf(stderr, "Error opening file\n");
 		exit(1);
@@ -379,12 +393,11 @@ void write_BMP(Graph * myGraph, char * name)
 	fclose(file);
 }
 
-
-void set_color(Graph * window, int r, int g, int b)
+void set_color(Graph *window, int r, int g, int b)
 {
 	window->color = RGB(r, g, b);
 }
-		
+
 void quit()
 {
 	SDL_Quit();

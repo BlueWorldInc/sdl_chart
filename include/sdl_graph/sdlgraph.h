@@ -24,6 +24,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 
 #define RGB(r, g, b) ((Uint8)r << 16 | (Uint8)g << 8 | (Uint8)b)
 
@@ -45,9 +46,17 @@ typedef struct graph {
 	Uint32 color;        /* When a pixel is printed to the screen, this variable will be used to determine which color
 						  * is to be printed on the screen */
     
-	SDL_Surface * workingSurface; /* This is the main SDL_Surface that is used transparently in most functions below */
+	SDL_Window* window;
+	SDL_Renderer *renderer;
+	// SDL_Surface * workingSurface; /* This is the main SDL_Surface that is used transparently in most functions below */
 } Graph;
 
+typedef struct pix {
+	int x;
+	int y;
+} Pix;
+
+Pix convert_to_pix(Graph* graph, float x, float y);
 
 void draw_grid(Graph *, int, int);
 /* This function will draw a grid to the SDL_Surface in the graph-struct. The function also takes
